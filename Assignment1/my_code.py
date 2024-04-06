@@ -60,7 +60,7 @@ def initialize_parameters_deep(layer_dims):
     return parameters
 
 
-def activation_function(A_prev, W, b, activation):
+def activation_function_forward(A_prev, W, b, activation):
     if activation == 'sigmoid':
         Z = np.dot(W, A_prev) + b
         linear_cache = (A_prev, W, b)
@@ -82,10 +82,10 @@ def L_model_forward(X, parameters):
 
     for i in range(L):
         A_prev = A
-        A, caches = activation_function(A_prev, parameters['W' + str(i)], parameters['b' + str(i)], activation='relu')
+        A, caches = activation_function_forward(A_prev, parameters['W' + str(i)], parameters['b' + str(i)], activation='relu')
         caches.append(caches)
 
-    AL, caches = activation_function(A, parameters['W' + str(L)], parameters['b' + str(L)], activation='relu')
+    AL, caches = activation_function_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], activation='relu')
     caches.append(caches)
 
     return AL, caches
@@ -100,10 +100,60 @@ def computer_cost(AL, Y):
     return cost
 
 
+def linear_backward(dZ, cache):
+    A_prev, W, b = cache
+    m = A_prev.shape[1]
+
+    dW = 1. / m * np.dot(dZ, A_prev.T)
+    db = 1. / m * np.sum(dZ)
+    dA_prev = np.dot(W.T, dZ)
+
+    assert (dA_prev.shape == A_prev.shape)
+    assert (dW.shape == W.shape)
+    assert (db.shape == b.shape)
+
+    return dA_prev, dW, db
+def activation_function_backward(dA, cache, activation):
+    dW, dB = cache
+
+    if activation == 'sigmoid':
+        dZ = sigmoid_backward(dA, dB)
+    elif activation == 'relu':
+        dZ = relu_backward(dA, dB)
+
+    dA_prev, dW, db = linear_backward(dZ,dB)
+
+    return dA_prev, dW, db
 def L_model_backward(AL, Y, caches):
+    grads = {}
+    L = len(caches)
+    m = AL.shape[1]
+    Y = Y.reshape(AL.shape)
+
+    dAL = -(np.divide(Y, AL.sum) - np.divide(1 - Y, 1 - AL))
+
+    current_cache = caches[L - 1]
+    grads["dA" + str(L)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL, current_cache,
+                                                                                                  activation="sigmoid")
+
+    for l in reversed(range(L - 1)):
+        current_cache = caches[l]
+        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 2)], current_cache,
+                                                                    activation="relu")
+        grads["dA" + str(l + 1)] = dA_prev_temp
+        grads["dW" + str(l + 1)] = dW_temp
+        grads["db" + str(l + 1)] = db_temp
+
+    return grads
 
 
 def update_parameters(parameters, grads,learning_rate):
+    L = len(parameters) // 2
+    for i in range(1, L):
+        parameters["W" + str(i)] -= learning_rate * grads["dW" + str(i)]
+        parameters["b" + str(i)] -= learning_rate * grads["db" + str(i)]
+
+    return parameters
 
 
 if __name__ == '__main__':
