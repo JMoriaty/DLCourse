@@ -147,7 +147,7 @@ def L_model_backward(AL, Y, caches):
     return grads
 
 
-def update_parameters(parameters, grads,learning_rate):
+def update_parameters(parameters, grads, learning_rate):
     L = len(parameters) // 2
     for i in range(1, L):
         parameters["W" + str(i)] -= learning_rate * grads["dW" + str(i)]
@@ -156,6 +156,3 @@ def update_parameters(parameters, grads,learning_rate):
     return parameters
 
 
-if __name__ == '__main__':
-    showdata()
-    StandardizeImage()
