@@ -143,7 +143,8 @@ def initialize_parameters_deep(layer_dims):
     L = len(layer_dims)
 
     for i in range(1, L):
-        parameters['W' + str(i)] = np.random.randn(layer_dims[i], layer_dims[i - 1]) * 0.01
+        # parameters['W' + str(i)] = np.random.randn(layer_dims[i], layer_dims[i - 1]) * 0.01
+        parameters['W' + str(i)] = np.random.randn(layer_dims[i], layer_dims[i - 1]) * np.sqrt(2. / layer_dims[i - 1])
         parameters['b' + str(i)] = np.random.randn(layer_dims[i], 1)
         assert (parameters['W' + str(i)].shape == (layer_dims[i], layer_dims[i - 1]))
         assert (parameters['b' + str(i)].shape == (layer_dims[i], 1))
@@ -394,7 +395,7 @@ def predict(X, y, parameters):
     return accuracy
 
 
-def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False):
+def L_layer_model(X, Y, layers_dims, learning_rate=0.005, num_iterations=3000, print_cost=False):
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
 
