@@ -239,8 +239,8 @@ def compute_cost(AL, Y):
     cost -- cross-entropy cost
     """
     m = Y.shape[1]
-    cost = (-1 / m) * np.sum(Y * np.log(AL) + (1 - AL) * np.log(1 - AL))
-    cost = np.squeeze(cost, axis=0)
+    cost = (-1 / m) * np.sum(Y * np.log(AL) + (1 - Y) * np.log(1 - AL))
+    cost = np.squeeze(cost)
     assert (cost.shape == ())
 
     return cost
@@ -369,11 +369,29 @@ def predict(X, y, parameters):
     Returns:
     p -- predictions for the given dataset X
     """
-    AL, caches = L_model_forward(X, parameters)
+    A = X
+    L = len(parameters) // 2  # number of layers in the neural network
+
+    # Implement [LINEAR -> RELU]*(L-1).
+    for l in range(1, L):
+        A_prev = A
+        W = parameters['W' + str(l)]
+        b = parameters['b' + str(l)]
+        Z = np.dot(W, A_prev) + b
+        A = np.maximum(0, Z)  # ReLU activation
+
+    # Implement [LINEAR -> SIGMOID].
+    W = parameters['W' + str(L)]
+    b = parameters['b' + str(L)]
+    Z = np.dot(W, A) + b
+    AL = 1 / (1 + np.exp(-Z))  # Sigmoid activation
 
     p = (AL > 0.5)
 
-    return p
+    correct_predictions = np.equal(p, y)
+    accuracy = np.mean(correct_predictions)
+
+    return accuracy
 
 
 def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, print_cost=False):

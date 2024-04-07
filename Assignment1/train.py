@@ -31,9 +31,17 @@ def showdata():
     print("Each image is of size: (" + str(num_px) + "," + str(num_px) + ",3)")
     print("train_x_orig's shape " + str(train_x_orig.shape))
     print("train_y's shape " + str(train_y.shape))
+    # print("train_y is:" + str(train_y))
     print("test_x_orig's shape " + str(test_x_orig.shape))
     print("test_y's shape " + str(test_y.shape))
     print("\n")
+
+
+# def compute_accuracy(predictions, labels):
+#     correct_predictions = np.equal(predictions, labels)
+#     accuracy = np.mean(correct_predictions)
+#
+#     return accuracy
 
 
 if __name__ == '__main__':
@@ -53,6 +61,8 @@ if __name__ == '__main__':
     print("\n")
 
     layers_dims = [12288, 20, 7, 5, 1]
-    parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True)
+    parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=10000, print_cost=True)
     pre_train = predict(train_x, train_y, parameters)
+    print("Train Accuracy: " + str(pre_train))
     pre_test = predict(test_x, test_y, parameters)
+    print("Test Accuracy: " + str(pre_train))
