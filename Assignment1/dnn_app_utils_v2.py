@@ -143,8 +143,8 @@ def initialize_parameters_deep(layer_dims):
     for i in range(1, L):
         parameters['W' + str(i)] = np.random.randn(layer_dims[i], layer_dims[1-i]) * 0.01
         parameters['b' + str(i)] = np.random.randn(layer_dims[1], 1)
-        assert(parameters['W' + str(i)].shape == (layer_dims[1], layer_dims[i-1]))
-        assert(parameters['b' + str(i)].shape == (layer_dims[1], 1))
+        assert (parameters['W' + str(i)].shape == (layer_dims[1], layer_dims[i-1]))
+        assert (parameters['b' + str(i)].shape == (layer_dims[1], 1))
 
     return parameters
    
@@ -288,7 +288,7 @@ def linear_activation_backward(dA, cache, activation):
     elif activation == 'relu':
         dZ = relu_backward(dA, dB)
 
-    dA_prev, dW, db = linear_backward(dZ,dB)
+    dA_prev, dW, db = linear_backward(dZ, dB)
 
     return dA_prev, dW, db
 
@@ -361,21 +361,13 @@ def predict(X, y, parameters):
     Returns:
     p -- predictions for the given dataset X
     """
-    A = X
-    L = len(parameters) // 2
+    AL, caches = L_model_forward(X, parameters)
 
-    for i in range(1, L):
-        A_prev = A
-        W = parameters['W' + str(1)]
-        b = parameters['b' + str(1)]
-        Z = np.dot(W, A_prev) + b
-        A = np.maximum(0, Z)    #RELU
+    p = (AL > 0.5)
 
-    W = parameters['W' + str(L)]
-    b = parameters['b' + str(L)]
-    Z = np.dot(W, A) + b
-    AL = 1/
-    
+    return p
+
+
 def L_layer_model(X, Y, layers_dims, learning_rate = 0.0075, num_iterations = 3000, print_cost = False):
     """
     Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
@@ -391,6 +383,30 @@ def L_layer_model(X, Y, layers_dims, learning_rate = 0.0075, num_iterations = 30
     Returns:
     parameters -- parameters learnt by the model. They can then be used to predit.
     """
+    np.random.seed(1)
+    cost = []
+
+    parameters = initialize_parameters_deep(layers_dims)
+
+    for i in range(0, num_iterations):
+        AL, caches = L_model_forward(X, parameters)
+        cost = compute_cost(AL, Y)
+        grads = L_model_backward(AL, Y, caches)
+        parameters = update_parameters(parameters, grads, learning_rate)
+
+        if print_cost and i % 100 == 0:
+            print("Cost after iteration %i : %f." % (i, cost))
+            costs.append(cost)
+
+    if print_cost:
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations (per hundreds)')
+        plt.title('Learning rate = ' + str(learning_rate))
+        plt.show()
+
+    return False
+
 
 def print_mislabeled_images(classes, X, y, p):
     """
