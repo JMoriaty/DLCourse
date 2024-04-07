@@ -36,7 +36,9 @@ def showdata():
     print("\n")
 
 
-def StandardizeImage():
+if __name__ == '__main__':
+    showdata()
+
     # Reshape the training and test examples
     train_x_flatten = train_x_orig.reshape(train_x_orig.shape[0], -1).T
     test_x_flatten = test_x_orig.reshape(test_x_orig.shape[0], -1).T
@@ -50,12 +52,7 @@ def StandardizeImage():
     print("test_x's shape " + str(test_x.shape))
     print("\n")
 
-
-if __name__ == '__main__':
-    showdata()
-    StandardizeImage()
-
-    layers_dim = [122880, 20, 7, 5, 1]
-    parameters = L_layer_model(train_x_orig, train_y, layers_dim, num_iterations = 2500, print_cost = True)
-    pre_train = predict(train_x_orig, train_y, parameters)
-    pre_test = predict(test_x_orig, test_y, parameters)
+    layers_dims = [12288, 20, 7, 5, 1]
+    parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True)
+    pre_train = predict(train_x, train_y, parameters)
+    pre_test = predict(test_x, test_y, parameters)
