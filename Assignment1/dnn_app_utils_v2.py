@@ -142,9 +142,9 @@ def initialize_parameters_deep(layer_dims):
 
     for i in range(1, L):
         parameters['W' + str(i)] = np.random.randn(layer_dims[i], layer_dims[i-1]) * 0.01
-        parameters['b' + str(i)] = np.random.randn(layer_dims[1], 1)
-        assert (parameters['W' + str(i)].shape == (layer_dims[1], layer_dims[i-1]))
-        assert (parameters['b' + str(i)].shape == (layer_dims[1], 1))
+        parameters['b' + str(i)] = np.random.randn(layer_dims[i], 1)
+        assert (parameters['W' + str(i)].shape == (layer_dims[i], layer_dims[i-1]))
+        assert (parameters['b' + str(i)].shape == (layer_dims[i], 1))
 
     return parameters
    
@@ -211,7 +211,7 @@ def L_model_forward(X, parameters):
     A = X
     L = len(parameters) // 2
 
-    for i in range(L):
+    for i in range(1, L):
         A_prev = A
         A, caches = linear_activation_forward(A_prev, parameters['W' + str(i)], parameters['b' + str(i)], activation='relu')
         caches.append(caches)
